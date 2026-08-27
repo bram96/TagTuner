@@ -1,25 +1,28 @@
-# TagTuner on a Seeed XIAO ESP32-C6, PN532 over I2C.
-# Only wiring and board specifics live here; behaviour is in the core packages.
+# TagTuner on a Wemos D1 mini ESP32, PN532 over SPI.
+# Same board as tagtuner-D1-custom1.yaml; only the PN532 bus differs.
+# Set the PN532 breakout jumpers to SPI.
+#
+# Wiring: SCK->22 (yellow), MOSI->21 (blue), MISO->27 (green), SS/CS->16 (white)
 
 substitutions:
-  led_pin: "15"
-  led_inverted: "true"
-  toggle_pin: "18" #D10
-  rotary_pin_a: "19" #D8
-  rotary_pin_b: "20" #D9
+  led_pin: "2"
+  toggle_pin: "23"
+  rotary_pin_a: "18"
+  rotary_pin_b: "19"
+  nfc_cs_pin: "16"
 
 packages:
   # project: github://luka6000/TagTuner/tagtuner-project.yaml@main
-  # core-nfc: github://luka6000/TagTuner/tagtuner-core-nfc.yaml@main
+  # core-nfc: github://luka6000/TagTuner/tagtuner-core-nfc-spi.yaml@main
   # core-comms: github://luka6000/TagTuner/tagtuner-core-comms.yaml@main
   project: !include tagtuner-project.yaml
-  core-nfc: !include tagtuner-core-nfc.yaml
+  core-nfc: !include tagtuner-core-nfc-spi.yaml
   core-comms: !include tagtuner-core-comms.yaml
   core-controls: !include tagtuner-core-controls.yaml
   core-led1: !include tagtuner-core-led1-binary.yaml
 
 esp32:
-  board: seeed_xiao_esp32c6
+  board: wemos_d1_mini32
   framework:
     type: esp-idf
     sdkconfig_options:
@@ -35,15 +38,12 @@ logger:
   logs:
     light: WARN
     # pn532: DEBUG
-    # pn532_i2c: DEBUG
+    # pn532_spi: DEBUG
 
-i2c:
-  id: bus_i2c
-  sda: 22 #D4
-  scl: 23 #D5
-  scan: False
-  frequency: 100kHz
-  timeout: 13ms #to prevent pn532 timeout
+spi:
+  clk_pin: 22
+  mosi_pin: 21
+  miso_pin: 27
 
 esp32_ble_tracker:
   scan_parameters:

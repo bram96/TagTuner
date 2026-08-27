@@ -24,6 +24,7 @@ jobs:
         tagtuner-for-tagreader.factory.yaml
         tagtuner-on-ha-voice-pe.factory.yaml
         tagtuner-D1-custom1.factory.yaml
+        tagtuner-D1-spi.factory.yaml
       esphome-version: stable
       combined-name: tagtuner-firmware
       #### Modify above here to match your project ####

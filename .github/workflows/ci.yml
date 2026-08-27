@@ -25,6 +25,7 @@ jobs:
         file:
           - tagtuner-XIAO-custom
           - tagtuner-D1-custom1
+          - tagtuner-D1-spi
           - tagtuner-atom-grove-ble
           - tagtuner-for-tagreader
           - tagtuner-on-ha-voice-pe

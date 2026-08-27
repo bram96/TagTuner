@@ -1,0 +1,15 @@
+# Shared pn532 on_tag_removed body. See tagtuner-nfc-on-tag.yaml.
+- binary_sensor.template.publish:
+    id: is_tag
+    state: false
+- text_sensor.template.publish:
+    id: status
+    state: "Tag removed"
+- script.execute:
+    id: tagtuner_event
+    action: "tagRemoved"
+    uid: !lambda 'return x;'
+    uri: ""
+    artist: ""
+    playlist: ""
+- script.execute: led_blink

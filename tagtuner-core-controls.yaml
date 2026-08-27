@@ -1,0 +1,51 @@
+# Shared TagTuner physical controls: one push button (single/double/triple/long
+# click) and one rotary encoder. Pins come from substitutions so every board
+# config only has to declare its wiring.
+#
+# Override in the device config:
+#   toggle_pin, toggle_pullup, rotary_pin_a, rotary_pin_b
+
+substitutions:
+  toggle_pullup: "true"
+
+binary_sensor:
+  - platform: gpio
+    id: toggle
+    pin:
+      number: ${toggle_pin}
+      inverted: true
+      mode:
+        input: true
+        pullup: ${toggle_pullup}
+    on_multi_click:
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 0.25s
+        - ON for at most 1s
+        - OFF for at most 0.25s
+        - ON for at most 1s
+      then: !include { file: tagtuner-controls-action.yaml, vars: { action: clickTriple, label: clickTriple } }
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 0.25s
+        - ON for at most 1s
+        - OFF for at least 0.25s
+      then: !include { file: tagtuner-controls-action.yaml, vars: { action: clickDouble, label: clickDouble } }
+    - timing:
+        - ON for 0.5s to 2s
+        - OFF for at least 50ms
+      then: !include { file: tagtuner-controls-action.yaml, vars: { action: clickLong, label: clickLong } }
+    - timing:
+        - ON for at most 0.5s
+        - OFF for at least 260ms
+      then: !include { file: tagtuner-controls-action.yaml, vars: { action: clickSingle, label: clickSingle } }
+
+sensor:
+  - platform: rotary_encoder
+    id: rotary
+    pin_a: ${rotary_pin_a}
+    pin_b: ${rotary_pin_b}
+    resolution: 2
+    restore_mode: ALWAYS_ZERO
+    on_clockwise: !include { file: tagtuner-controls-action.yaml, vars: { action: volumeUp, label: "Volume up" } }
+    on_anticlockwise: !include { file: tagtuner-controls-action.yaml, vars: { action: volumeDown, label: "Volume down" } }

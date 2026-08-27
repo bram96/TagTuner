@@ -1,0 +1,15 @@
+# Shared "an input happened" body.
+# Included with vars: { action: <event name>, label: <status text> }
+#   action - must exist in the event_types list in tagtuner-core-comms.yaml
+#   label  - what the Status sensor shows
+- script.execute: led_blink
+- text_sensor.template.publish:
+    id: status
+    state: "${label}"
+- script.execute:
+    id: tagtuner_event
+    action: "${action}"
+    uid: ""
+    uri: ""
+    artist: ""
+    playlist: ""

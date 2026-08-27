@@ -1,0 +1,18 @@
+# TagTuner NFC core over SPI (PN532 jumpers set to SPI).
+# I2C twin: tagtuner-core-nfc.yaml. Shared parts: tagtuner-core-nfc-base.yaml.
+#
+# Expects an spi bus (clk/mosi/miso) in the device config.
+
+substitutions:
+  nfc_cs_pin: GPIO16
+  nfc_update_interval: 350ms
+
+packages:
+  core-nfc-base: !include tagtuner-core-nfc-base.yaml
+
+pn532_spi:
+  - id: pn532_board
+    cs_pin: ${nfc_cs_pin}
+    update_interval: ${nfc_update_interval}
+    on_tag: !include tagtuner-nfc-on-tag.yaml
+    on_tag_removed: !include tagtuner-nfc-on-tag-removed.yaml

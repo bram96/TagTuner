@@ -1,0 +1,83 @@
+# Shared single on/off LED feedback (boards without an RGB LED) plus the
+# hello-world boot blink. Boards with an addressable LED (m5stack atom) define
+# their own light + led_* scripts instead of including this package.
+#
+# Override in the device config: led_pin, led_inverted
+
+substitutions:
+  led_inverted: "false"
+
+esphome:
+  # hello world
+  on_boot:
+    priority: -100
+    then:
+    - light.turn_on:
+        id: led1
+        effect: TagWrite
+    - delay: 1000ms
+    - light.turn_off: led1
+    - wait_until:
+        condition:
+          api.connected:
+        timeout: 20s
+    - text_sensor.template.publish:
+        id: status
+        state: "Ready"
+
+output:
+  - platform: gpio
+    id: led1_gpio
+    pin: ${led_pin}
+    inverted: ${led_inverted}
+
+light:
+  - platform: binary
+    id: led1
+    output: led1_gpio
+    restore_mode: ALWAYS_OFF
+    effects:
+      - strobe:
+          name: TagWrite
+          colors:
+            - state: true
+              duration: 250ms
+            - state: false
+              duration: 50ms
+
+script:
+  - id: led_blink
+    then:
+    - light.turn_off: led1
+    - light.turn_on:
+        id: led1
+        flash_length: 100ms
+  - id: led_ok
+    then:
+    - light.turn_off: led1
+    - light.turn_on:
+        id: led1
+        flash_length: 50ms
+    - delay: 100ms
+    - light.turn_on:
+        id: led1
+        flash_length: 50ms
+  - id: led_success
+    then:
+    - light.turn_off: led1
+    - light.turn_on:
+        id: led1
+        flash_length: 200ms
+    - delay: 250ms
+    - light.turn_on:
+        id: led1
+        flash_length: 200ms
+    - delay: 250ms
+    - light.turn_on:
+        id: led1
+        flash_length: 500ms
+  - id: led_tagwrite
+    then:
+    - light.turn_on:
+        id: led1
+        effect: TagWrite

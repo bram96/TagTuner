@@ -1,0 +1,60 @@
+# Shared pn532 on_tag body, included by tagtuner-core-nfc.yaml (I2C)
+# and tagtuner-core-nfc-spi.yaml (SPI). Keep bus-independent.
+- binary_sensor.template.publish:
+    id: is_tag
+    state: true
+- text_sensor.template.publish:
+    id: status
+    state: !lambda 'return "Tag "+x;'
+- lambda: |-
+    id(playlist)="";
+    id(artist)="";
+    id(uri)="";
+    if (tag.has_ndef_message()) {
+      for (auto &record : tag.get_ndef_message()->get_records() ) {
+        std::string payload = record->get_payload();
+        std::string type = record->get_type();
+
+        if ( payload.substr(0, 7) == "artist/" ) {
+          id(artist)=payload.substr(7);
+        }
+        else if ( payload.substr(0, 9) == "playlist/" ) {
+          id(playlist)=payload.substr(9);
+        }
+        else if (type == "U"
+        && payload.substr(0, 20) != "https://mb.senic.com"
+        && payload.substr(0, 23) != "https://www.philips.com"
+        ) {
+          id(uri)=payload;
+        }
+
+      }
+    }
+- if:
+    condition:
+      lambda: 'return id(uri) == "" ;'
+    then:
+      - text_sensor.template.publish:
+          id: status
+          state: "Plain UID tag"
+      - homeassistant.tag_scanned: !lambda |-
+          ESP_LOGD("tagtuner", "No TagTuner NDEF, using UID");
+          return x;
+- if:
+    condition:
+      lambda: 'return id(uri).find("https://www.home-assistant.io/tag/") != std::string::npos ;'
+    then:
+      - homeassistant.tag_scanned: !lambda |-
+          ESP_LOGD("tagtuner", "HA NDEF found");
+          size_t pos = id(uri).find("https://www.home-assistant.io/tag/");
+          return id(uri).substr(pos + 34);
+    else:
+      - script.execute:
+          id: tagtuner_event
+          action: "tagScanned"
+          uid: !lambda 'return x;'
+          uri: !lambda 'return id(uri);'
+          artist: !lambda 'return id(artist);'
+          playlist: !lambda 'return id(playlist);'
+      - script.execute: set_tag
+- script.execute: led_ok

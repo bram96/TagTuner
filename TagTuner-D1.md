@@ -34,6 +34,19 @@ hw040 connector:
 - +: +3.3V
 - GND: GND
 
+#### Wiring D1-Custom over SPI
+Alternative to I2C, if the PN532 board misbehaves on I2C. Same board, same
+encoder wiring, only the PN532 changes:
+- GND: GND
+- VCC: VCC (+5V)
+- SCK: IO22
+- MOSI: IO21
+- MISO: IO27
+- SS/NSS: IO16
+
+Set the PN532 DIP switches to SPI (01) instead of I2C (10), and flash
+[tagtuner-D1-spi.yaml](https://github.com/luka6000/TagTuner/blob/main/tagtuner-D1-spi.yaml).
+
 ![BCAC91FD-93C7-45B1-BD3F-C07717A7AF5C_1_201_a](https://github.com/user-attachments/assets/6c01184f-bc0a-4e16-bff7-f1452aa176a0)
 
 ESP32 D1 mini will fit perfectly into the bottom part braces
@@ -59,6 +72,7 @@ Use 10mm M2.5 screws (nfc board, volume encoder, front plate).
 
 - [quick start](https://luka6000.github.io/TagTuner/#installation): use pre-built firmware with [ESP Web Tools](https://esphome.github.io/esp-web-tools/) powered installer [here](https://luka6000.github.io/TagTuner/#installation)
 - [tagtuner-D1-custom1.yaml](https://github.com/luka6000/TagTuner/blob/main/tagtuner-D1-custom1.yaml): ESP32 D1 mini with HW-040 rotary encoder and button. Bluetooth & BLE proxy, ESP-IDF framework
+- [tagtuner-D1-spi.yaml](https://github.com/luka6000/TagTuner/blob/main/tagtuner-D1-spi.yaml): same board, PN532 connected over SPI instead of I2C
 
 ## Disclaimer
 All of this is my personal hobby project, available for free download and personal use. If you’d like to support me with a coffee, beer, filament, or electronic parts, feel free to use [paypal.me/lukagra](https://paypal.me/lukagra) or [ko-fi.com/lukagra](https://ko-fi.com/lukagra)
